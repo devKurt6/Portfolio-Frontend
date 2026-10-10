@@ -1,0 +1,4 @@
+PORTFOLIO_API_MODE=live
+PORTFOLIO_API_BASE_URL=https://kurt-portfolio-api.onrender.com/
+PORTFOLIO_CONTACT_MODE=backend
+PORTFOLIO_CHAT_MODE=backend

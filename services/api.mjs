@@ -23,7 +23,7 @@ async function request(url, options = {}, json = true) {
     try {
         const response = await fetch(url, { ...options, signal: abort.signal }); const text = await response.text(); let data;
         try { data = json ? JSON.parse(text) : text; } catch { throw new ApiError('The server returned an unexpected response. Please retry.', response.status); }
-        if (!response.ok) throw new ApiError(json ? data?.error?.message || 'The request failed. Please retry.' : 'The request failed. Please retry.', response.status, Number(response.headers.get('Retry-After')) || 0);
+        if (!response.ok) throw new ApiError(json ? data?.error?.message || 'The request failed. Please retry.' : typeof data === 'string' && data.length <= 500 && !/[<>]/.test(data) ? data : 'The request failed. Please retry.', response.status, Number(response.headers.get('Retry-After')) || 0);
         return data;
     } catch (error) { if (error instanceof ApiError) throw error; throw new ApiError(abort.signal.aborted ? 'The server is taking longer to wake up. Please retry.' : 'Could not reach the server. Check your connection and retry.'); }
     finally { clearTimeout(timer); }

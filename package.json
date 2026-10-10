@@ -5,7 +5,7 @@
     "build": "node tools/build.mjs",
     "lint": "node tools/check.mjs",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "node --test tools/api.test.mjs",
+    "test": "node --test tools/api.test.mjs tools/groq.test.cjs",
     "dev": "node tools/serve.mjs"
   },
   "devDependencies": { "typescript": "5.6.3" }

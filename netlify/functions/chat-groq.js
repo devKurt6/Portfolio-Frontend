@@ -47,10 +47,25 @@ exports.handler = async function (event) {
     };
   }
 
-  const GROQ_API_KEY = process.env.GROQ_API_KEY;
-  const SYSTEM_PROMPT = process.env.SYSTEM_PROMPT;
+  const GROQ_API_KEY = (process.env.GROQ_API_KEY || '').trim();
+  const SYSTEM_PROMPT = (process.env.SYSTEM_PROMPT || '').trim() ||
+    "You are Kurt Decena's portfolio assistant. Answer using the provided portfolio information. Do not invent experience or project details. If information is unavailable, say so. Keep answers helpful and concise.";
 
-  const { question, history = [] } = JSON.parse(event.body);
+  if (!GROQ_API_KEY) {
+    return { statusCode: 503, body: 'Chat is not configured. Set GROQ_API_KEY in the Netlify Functions environment and redeploy.' };
+  }
+
+  let payload;
+  try { payload = JSON.parse(event.body || '{}'); }
+  catch { return { statusCode: 400, body: 'Send a valid chat message.' }; }
+  if (!payload || typeof payload.question !== 'string' || !payload.question.trim() || payload.question.length > 2000) {
+    return { statusCode: 400, body: 'Write a message of 1–2000 characters.' };
+  }
+  const question = payload.question.trim();
+  const history = Array.isArray(payload.history) ? payload.history.slice(-20).filter(item =>
+    item && ['user', 'assistant'].includes(item.role) && typeof item.content === 'string' && item.content.length <= 4000
+  ).map(item => ({ role: item.role, content: item.content })) : [];
+  if (history.at(-1)?.role !== 'user' || history.at(-1)?.content !== question) history.push({ role: 'user', content: question });
 
   // Load portfolio data
   const context = await retrieveContext(question);
@@ -97,20 +112,22 @@ ${context}`
 
     if (!response.ok) {
 
-      const error = await response.text();
-
-      console.error(error);
+      console.error('Groq request failed with HTTP status:', response.status);
 
       return {
-        statusCode: 500,
-        body: "Sorry, I'm having trouble responding right now. Please try again later."
+        statusCode: response.status === 429 ? 429 : 502,
+        body: response.status === 401 ? 'Groq authentication failed. Check the GROQ_API_KEY in Netlify and redeploy.' :
+          response.status === 429 ? 'The AI service has reached its usage limit. Please try again later.' :
+          response.status === 400 || response.status === 403 || response.status === 404 ? 'The AI provider rejected the request. Check the Groq model access and Netlify function logs.' :
+          "The AI service is temporarily unavailable. Please try again later."
       };
 
     }
 
     const data = await response.json();
 
-    const reply = data.choices[0].message.content;
+    const reply = data.choices?.[0]?.message?.content;
+    if (typeof reply !== 'string' || !reply.trim()) throw new Error('Missing assistant response');
 
     return {
 
