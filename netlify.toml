@@ -1,0 +1,7 @@
+[build]
+  command = "node tools/build.mjs && node tools/publish.mjs"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  included_files = ["portfolio/**"]

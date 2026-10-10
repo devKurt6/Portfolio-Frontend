@@ -1,0 +1,9 @@
+/node_modules/
+/dist/
+/.qa/
+/tmp/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+/reference portfolio design/

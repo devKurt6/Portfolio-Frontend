@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>Contact - Kurt Decena</title><link rel="icon" href="/favicon.ico" type="image/x-icon"><link rel="stylesheet" href="/style.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark'}catch{}</script></head>
+  <body data-page="contact"><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="wrap header-inner"><a class="logo" href="/" aria-label="Kurt Decena home">Kurt Decena<span aria-hidden="true">.</span></a><nav aria-label="Main navigation"><a href="/">Home</a><a href="/projects/">Projects</a><a href="/about/">About</a><a href="/contact/" aria-current="page">Contact</a></nav><button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" title="Switch theme">☀</button></div></header>
+  <main id="main" tabindex="-1"><div class="wrap page-content"><div class="contact-wrapper">
+                <div class="contact-info">
+                    <h1>Let's Work Together</h1>
+                    <p>I'm always interested in hearing about new projects and opportunities. Whether you have a
+                        question or just want to say hi, feel free to reach out!</p>
+
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email</h4>
+                                <a href="mailto:kurtdecena41@gmail.com">kurtdecena41@gmail.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Location</h4>
+                                <p>Sto. Tomas Batangas, Calabarzon, Philippines</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="social-links-contact">
+                        <a href="https://github.com/devKurt6" class="social-link" aria-label="GitHub" target="_blank"
+                            rel="noopener">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                        <a href="https://www.facebook.com/KurtCortezDecena6" class="social-link" aria-label="Facebook"
+                            target="_blank" rel="noopener">
+                            <i class="fa-brands fa-facebook"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/kurt-decena-50b366277/" class="social-link"
+                            aria-label="LinkedIn" target="_blank" rel="noopener">
+                            <i class="fa-brands fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="contact-form-container">
+                    <form class="contact-form" id="contactForm" name="contact-main" method="POST" netlify action="/success.html"
+                        netlify-honeypot="bot-field">
+                        <input type="hidden" name="form-name" value="contact-main"><label class="honeypot" aria-hidden="true">Leave blank<input name="bot-field" tabindex="-1" autocomplete="off"></label>
+                        <!-- <input type="hidden" name="error-redirect" value="error.html"> -->
+
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" placeholder="Your name" required><span class="field-error" id="name-error"></span>
+                        </div><div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="your.email@example.com" required><span class="field-error" id="email-error"></span>
+                        </div><div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" placeholder="Tell me about your project..." rows="6"
+                                required></textarea><span class="field-error" id="message-error"></span>
+                        </div><button type="submit" class="btn btn-primary">
+                            Send Message <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div></div></main>
+  <footer class="site-footer"><div class="wrap footer-inner"><span>© 2026 Kurt Decena</span><div><a href="https://github.com/devKurt6" target="_blank" rel="noopener">GitHub</a><a href="https://www.facebook.com/KurtCortezDecena6" target="_blank" rel="noopener">Facebook</a><a href="https://www.linkedin.com/in/kurt-decena-50b366277/" target="_blank" rel="noopener">LinkedIn</a><a href="mailto:kurtdecena41@gmail.com">Email</a></div></div></footer>
+  <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div><button id="chatToggle" class="chat-fab" aria-expanded="false" aria-controls="chatWindow" aria-label="Ask my assistant"><span class="chat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12 7.8L3 21l1.7-5.3A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 11h.01M12 11h.01M16 11h.01" stroke-linecap="round" stroke-width="3"/></svg></span><span class="chat-label">Ask my assistant</span><span class="close-icon" aria-hidden="true">×</span></button><div id="chatHost"></div><script type="module" src="/app.mjs"></script></body></html>

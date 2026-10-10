@@ -1,0 +1,63 @@
+[
+    {
+        "title": "Embedded System Plate Number Recognition",
+        "description": "Real-time license plate recognition system using YOLO, OCR, OpenCV, and Python deployed on embedded hardware.",
+        "technologies": [
+            "YOLO",
+            "Python",
+            "OCR",
+            "OpenCV",
+            "Flask"
+        ]
+    },
+    {
+        "title": "Plate Number Recognition Web Application",
+        "description": "Flask-based web application capable of detecting and recognizing vehicle license plates in real time.",
+        "technologies": [
+            "Flask",
+            "Python",
+            "YOLO",
+            "OpenCV"
+        ]
+    },
+    {
+        "title": "Gun Detection System",
+        "description": "AI-powered computer vision system that detects firearms using YOLO and provides real-time monitoring.",
+        "technologies": [
+            "YOLO",
+            "Flask",
+            "Python",
+            "OpenCV"
+        ]
+    },
+    {
+        "title": "Smart Helmet for Riders",
+        "description": "IoT-based rider safety system using ESP32 with GPS tracking, GPRS communication, and FastAPI backend.",
+        "technologies": [
+            "ESP32",
+            "FastAPI",
+            "Python",
+            "GPS",
+            "IoT"
+        ]
+    },
+    {
+        "title": "Uniform Detection with Fingerprint Attendance",
+        "description": "Attendance monitoring system using AI-based uniform detection and fingerprint authentication.",
+        "technologies": [
+            "YOLO",
+            "Flask",
+            "Raspberry Pi",
+            "Python"
+        ]
+    },
+    {
+        "title": "Wedding Invitation Website",
+        "description": "Responsive wedding invitation website with RSVP, countdown timer, gallery, and venue map.",
+        "technologies": [
+            "HTML",
+            "CSS",
+            "JavaScript"
+        ]
+    }
+]

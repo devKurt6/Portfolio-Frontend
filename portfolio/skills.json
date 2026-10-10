@@ -1,0 +1,64 @@
+[
+    {
+        "category": "Programming Languages",
+        "skills": [
+            "Python",
+            "JavaScript",
+            "HTML",
+            "CSS",
+            "C#",
+            "Visual Basic .NET",
+            "SQL",
+            "C++"
+        ]
+    },
+    {
+        "category": "Frameworks",
+        "skills": [
+            "Flask",
+            "FastAPI",
+            "Bootstrap"
+        ]
+    },
+    {
+        "category": "Artificial Intelligence",
+        "skills": [
+            "YOLO",
+            "OpenCV",
+            "OCR",
+            "Machine Learning",
+            "Computer Vision",
+            "LLM Integration",
+            "Groq API",
+            "Ollama",
+            "LangChain"
+        ]
+    },
+    {
+        "category": "Database",
+        "skills": [
+            "SQLite",
+            "MySQL",
+            "Firebase"
+        ]
+    },
+    {
+        "category": "Deployment",
+        "skills": [
+            "Netlify",
+            "Render",
+            "GitHub",
+            "Git"
+        ]
+    },
+    {
+        "category": "Embedded Systems",
+        "skills": [
+            "ESP32",
+            "Arduino",
+            "Raspberry Pi",
+            "GPS",
+            "MQ3 Alcohol Sensor"
+        ]
+    }
+]

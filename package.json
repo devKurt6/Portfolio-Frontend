@@ -1,0 +1,12 @@
+{
+  "name": "kurt-web-portfolio",
+  "private": true,
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "lint": "node tools/check.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test tools/api.test.mjs",
+    "dev": "node tools/serve.mjs"
+  },
+  "devDependencies": { "typescript": "5.6.3" }
+}

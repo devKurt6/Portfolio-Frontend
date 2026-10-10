@@ -1,0 +1,26 @@
+[
+    {
+        "company": "Brother Industries Philippines Inc.",
+        "position": "IT System Maintenance & Development",
+        "duration": "May 2025 - July 2026",
+        "responsibilities": [
+            "Maintained enterprise IT systems",
+            "Supported MES",
+            "Supported SAP",
+            "Maintained SharePoint portals",
+            "Developed internal business applications",
+            "Performed system troubleshooting",
+            "Provided technical support"
+        ]
+    },
+    {
+        "company": "Sophie's Information Technology Inc.",
+        "position": "Software Development Intern",
+        "duration": "January 2024 - March 2024",
+        "responsibilities": [
+            "Developed software applications",
+            "Learned software engineering practices",
+            "Participated in development projects"
+        ]
+    }
+]
