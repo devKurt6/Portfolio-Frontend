@@ -53,4 +53,4 @@ Optional Playwright QA scripts in `tools/` require a QA runtime; `backend-browse
 
 `.gitignore` excludes `.env`, `node_modules`, `dist`, and `.qa`. If uploading through GitHub’s browser, omit those manually. Include `.env.example` and all source/config/content files.
 
-The backend is independently seeded from its own `app/content/` snapshots. When editing frontend `data/projects.json` or `portfolio/about.txt`, update the separate backend snapshots deliberately. Existing database project rows are not overwritten by seeding. No sibling-folder filesystem access is required by either app.
+The backend is independently seeded from its own `app/content/` snapshots. When editing frontend `data/projects.json` or `portfolio/about.txt`, update the separate backend snapshots deliberately. Backend startup now adds/updates project content by slug without clearing wall data. Deploy the updated backend seed script to enable this behavior. No sibling-folder filesystem access is required by either app.
