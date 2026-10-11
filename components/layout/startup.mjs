@@ -22,7 +22,6 @@ export function startPortfolio() {
         return Promise.resolve();
     }
     return new Promise(resolve => {
-        const shownAt = performance.now();
         const panel = document.getElementById('startupScreen') || document.createElement('section');
         panel.className = 'startup-screen';
         panel.setAttribute('role', 'dialog');
@@ -49,9 +48,13 @@ export function startPortfolio() {
             log.append(line);
         }
         let finished = false;
+        /** @type {ReturnType<typeof setTimeout>[]} */
+        let logTimers = [];
+        function clearLogTimers() { logTimers.forEach(clearTimeout); logTimers = []; }
         function close(ready = true) {
             if (finished) return;
             finished = true;
+            clearLogTimers();
             document.documentElement.classList.remove('startup-pending');
             rememberStartup();
             step(ready ? 'Backend connected — ready' : 'Opening website without waiting');
@@ -79,23 +82,31 @@ export function startPortfolio() {
             });
         }
         async function connect() {
+            const shownAt = performance.now();
             retry.hidden = true;
             proceed.hidden = false;
             log.replaceChildren();
-            step('Initialising interface');
-            step('Connecting projects and Freedom Wall');
+            clearLogTimers();
+            step('Starting your experience');
+            ['Preparing the interface', 'Setting up your workspace', 'Connecting portfolio services'].forEach((message, index) => {
+                logTimers.push(setTimeout(() => { if (!finished) step(message); }, (index + 1) * 500));
+            });
             progress.textContent = 'Connecting…';
             panel.classList.remove('startup-failed');
             status.textContent = 'Connecting to projects and the Freedom Wall…';
             const timer = setTimeout(() => { if (!finished) { step('Waking up server — please wait'); progress.textContent = 'Waiting for server'; status.textContent = 'Waking up the server. Your portfolio will open automatically…'; } }, 4000);
             try {
                 await wakeBackend();
-                await new Promise(done => setTimeout(done, Math.max(0, 2500 - (performance.now() - shownAt))));
+                await new Promise(done => setTimeout(done, Math.max(0, 2000 - (performance.now() - shownAt))));
+                if (finished) return;
+                step('Ready');
+                await new Promise(done => setTimeout(done, 500));
                 close();
             }
             catch (error) {
                 if (finished) return;
                 clearTimeout(timer);
+                clearLogTimers();
                 panel.classList.add('startup-failed');
                 status.textContent = error instanceof Error ? error.message : 'Could not connect. Please retry.';
                 step('Connection delayed — retry available');
