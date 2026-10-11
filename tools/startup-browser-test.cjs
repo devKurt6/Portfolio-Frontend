@@ -5,6 +5,26 @@ const assert = require('node:assert/strict');
   try { browser = await chromium.launch({headless:true}); }
   catch { browser = await chromium.launch({headless:true,channel:'msedge'}); }
   try {
+    const fastContext = await browser.newContext({reducedMotion:'reduce'});
+    let releaseApp;
+    const appGate = new Promise(resolve => { releaseApp = resolve; });
+    await fastContext.route('**/app.mjs', async route => { await appGate; await route.continue(); });
+    let fastProbeAt = 0;
+    await fastContext.route('https://startup.test/api/**', route => {
+      const health = route.request().url().endsWith('/health');
+      if (health) fastProbeAt = Date.now();
+      return route.fulfill({contentType:'application/json',body:health ? '{"status":"ok"}' : route.request().url().includes('/projects') ? '[]' : '{"items":[],"total":0,"nextOffset":0}'});
+    });
+    const fastPage = await fastContext.newPage();
+    const navigation = fastPage.goto('http://127.0.0.1:4173/');
+    await fastPage.locator('#startupScreen').waitFor({state:'visible'});
+    assert.equal(await fastPage.locator('#main').evaluate(el=>getComputedStyle(el).visibility),'hidden','Home must be hidden before app script arrives');
+    releaseApp();
+    await navigation;
+    await fastPage.locator('#startupScreen').waitFor({state:'detached',timeout:10000});
+    assert.ok(fastProbeAt > 0, 'Backend wakes during startup');
+    assert.ok(Date.now() - fastProbeAt >= 2400, 'Even an already-ready backend keeps startup visible for 2.5 seconds');
+    await fastContext.close();
     for (const width of [375,1280]) {
       const context = await browser.newContext({viewport:{width,height:900},reducedMotion:width === 375 ? 'reduce' : 'no-preference'});
       let probes=0, ready=false, premature=false;

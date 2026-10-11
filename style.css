@@ -1664,3 +1664,10 @@ input[aria-invalid=true],textarea[aria-invalid=true] {
 @keyframes startup-curtain { 0% { transform:translateY(0); opacity:1; } 25% { opacity:1; } 100% { transform:translateY(-100%); opacity:0; } }
 @keyframes portfolio-reveal { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
 @media(prefers-reduced-motion:reduce) { .startup-wave path { stroke-dashoffset:0; } .startup-wave path,.startup-log li,.startup-track span,.startup-screen.startup-opening,.startup-revealing > main,.startup-revealing > .site-header { animation:none!important; transition:none!important; } }
+
+/* Decide in the document head before the first page paint. */
+#startupScreen { display: none; }
+.startup-pending #startupScreen { display: grid; }
+.startup-pending body { overflow: hidden; }
+.startup-pending body > :not(.startup-screen) { visibility: hidden; }
+#startupScreen.startup-opening { display: grid; }

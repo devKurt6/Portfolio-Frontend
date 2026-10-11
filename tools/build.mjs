@@ -1,9 +1,11 @@
 import { projectDetail } from '../components/projects/detail.mjs';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { documentShell } from '../components/layout/render.mjs';
+import { documentShell as renderShell } from '../components/layout/render.mjs';
 import { projectCard } from '../components/projects/render.mjs';
 import { escapeHTML as e } from '../lib/text.mjs';
-import './configure.mjs';
+import { config } from './configure.mjs';
+/** @param {Parameters<typeof renderShell>[0]} options */
+const documentShell = options => renderShell({ ...options, startupEnabled: config.mode === 'live' });
 const read = async (path) => JSON.parse(await readFile(path, 'utf8'));
 const content = await read('data/content.json');
 const projects = await read('data/projects.json');

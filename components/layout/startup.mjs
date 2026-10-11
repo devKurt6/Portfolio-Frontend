@@ -1,3 +1,4 @@
+import { startupMarkup } from './startup-markup.mjs';
 import { apiConfig, wakeBackend } from '../../services/api.mjs';
 
 const SESSION_KEY = 'kurt-startup-seen-v1';
@@ -15,16 +16,21 @@ function rememberStartup() {
 
 /** Wait for backend readiness before mounting live pages. Mock mode opens directly. */
 export function startPortfolio() {
-    if (apiConfig.mode !== 'live' || startupSeen()) return Promise.resolve();
+    if (apiConfig.mode !== 'live' || startupSeen()) {
+        document.getElementById('startupScreen')?.remove();
+        document.documentElement.classList.remove('startup-pending');
+        return Promise.resolve();
+    }
     return new Promise(resolve => {
-        const panel = document.createElement('section');
+        const shownAt = performance.now();
+        const panel = document.getElementById('startupScreen') || document.createElement('section');
         panel.className = 'startup-screen';
         panel.setAttribute('role', 'dialog');
         panel.setAttribute('aria-modal', 'true');
         panel.setAttribute('aria-labelledby', 'startupTitle');
         panel.tabIndex = -1;
-        panel.innerHTML = `<div class="startup-card"><h1 id="startupTitle" class="startup-brand">Kurt<span>.dev</span></h1><svg class="startup-wave" viewBox="0 0 360 60" aria-hidden="true"><path d="M0 30h44l8-22 12 44 10-32 8 10h64l8-18 12 36 10-28 8 10h164"/></svg><ul class="startup-log" aria-hidden="true"></ul><p class="startup-status sr-only" role="status" aria-live="polite">Connecting to projects and the Freedom Wall…</p><div class="startup-track" aria-hidden="true"><span></span></div><div class="startup-meta"><span class="startup-progress">Connecting…</span><button class="startup-skip" id="startupContinue">Skip</button></div><p class="startup-hint">The first visit may take about a minute while the server wakes up.</p><div class="startup-actions"><button class="btn primary" id="startupRetry" hidden>Try again</button></div></div>`;
-        const siblings = [...document.body.children].filter(element => element instanceof HTMLElement);
+        panel.innerHTML = startupMarkup;
+        const siblings = [...document.body.children].filter(element => element instanceof HTMLElement && element !== panel);
         const saved = siblings.map(element => ({ element: /** @type {HTMLElement} */ (element), inert: /** @type {HTMLElement} */ (element).inert }));
         const oldOverflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
@@ -46,6 +52,7 @@ export function startPortfolio() {
         function close(ready = true) {
             if (finished) return;
             finished = true;
+            document.documentElement.classList.remove('startup-pending');
             rememberStartup();
             step(ready ? 'Backend connected — ready' : 'Opening website without waiting');
             progress.textContent = ready ? '100%' : 'Skipped';
@@ -81,7 +88,11 @@ export function startPortfolio() {
             panel.classList.remove('startup-failed');
             status.textContent = 'Connecting to projects and the Freedom Wall…';
             const timer = setTimeout(() => { if (!finished) { step('Waking up server — please wait'); progress.textContent = 'Waiting for server'; status.textContent = 'Waking up the server. Your portfolio will open automatically…'; } }, 4000);
-            try { await wakeBackend(); close(); }
+            try {
+                await wakeBackend();
+                await new Promise(done => setTimeout(done, Math.max(0, 2500 - (performance.now() - shownAt))));
+                close();
+            }
             catch (error) {
                 if (finished) return;
                 clearTimeout(timer);
