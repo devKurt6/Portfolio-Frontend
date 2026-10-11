@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
   catch { browser = await chromium.launch({headless:true,channel:'msedge'}); }
   try {
     for (const width of [375,1280]) {
-      const context = await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});
+      const context = await browser.newContext({viewport:{width,height:900},reducedMotion:width === 375 ? 'reduce' : 'no-preference'});
       let probes=0, ready=false, premature=false;
       await context.route('**/config/runtime.mjs',route=>route.fulfill({contentType:'text/javascript',body:'export const runtimeConfig={mode:"live",baseUrl:"https://startup.test",contactMode:"legacy",chatMode:"legacy"};'}));
       await context.route('https://startup.test/api/**',async route=>{
@@ -34,6 +34,7 @@ const assert = require('node:assert/strict');
     await context.route('**/config/runtime.mjs',route=>route.fulfill({contentType:'text/javascript',body:'export const runtimeConfig={mode:"live",baseUrl:"",contactMode:"legacy",chatMode:"legacy"};'}));
     const page=await context.newPage();await page.goto('http://127.0.0.1:4173/');
     await page.locator('#startupRetry').waitFor();await page.locator('#startupContinue').click();
+    await page.locator('.startup-screen').waitFor({state:'detached'});
     assert.equal(await page.locator('.startup-screen').count(),0);
     assert.equal(await page.locator('#main').evaluate(el=>el.inert),false);
     await context.close();

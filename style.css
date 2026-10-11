@@ -1659,3 +1659,12 @@ input[aria-invalid=true],textarea[aria-invalid=true] {
 @keyframes startup-spin { to { transform:rotate(360deg); } }
 @keyframes startup-sweep { from { transform:translateX(-100%); } to { transform:translateX(250%); } }
 @media(prefers-reduced-motion:reduce) { .startup-orbit span,.startup-track span { animation:none!important; } }
+
+/* Open the portfolio smoothly once the backend is ready. */
+.startup-screen.startup-opening { animation:startup-open .75s cubic-bezier(.22,1,.36,1) both; pointer-events:none; }
+.startup-opening .startup-card { animation:startup-card-exit .6s cubic-bezier(.22,1,.36,1) both; }
+.startup-revealing > main { animation:portfolio-reveal .8s cubic-bezier(.22,1,.36,1) both; }
+@keyframes startup-open { from { opacity:1; } to { opacity:0; } }
+@keyframes startup-card-exit { from { opacity:1; transform:translateY(0) scale(1); } to { opacity:0; transform:translateY(-28px) scale(.96); } }
+@keyframes portfolio-reveal { from { opacity:.25; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@media(prefers-reduced-motion:reduce) { .startup-screen.startup-opening,.startup-opening .startup-card,.startup-revealing > main { animation:none!important; } }

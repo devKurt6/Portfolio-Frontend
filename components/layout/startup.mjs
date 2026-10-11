@@ -25,11 +25,26 @@ export function startPortfolio() {
         function close() {
             if (finished) return;
             finished = true;
-            panel.remove();
-            document.body.style.overflow = oldOverflow;
-            saved.forEach(item => { item.element.inert = item.inert; });
-            document.getElementById('main')?.focus({ preventScroll: true });
+            retry.disabled = proceed.disabled = true;
+            // Mount live content beneath the opening screen, so its requests
+            // start during the transition instead of after it disappears.
             resolve(undefined);
+            function reveal() {
+                panel.remove();
+                document.body.classList.remove('startup-revealing');
+                document.body.style.overflow = oldOverflow;
+                saved.forEach(item => { item.element.inert = item.inert; });
+                document.getElementById('main')?.focus({ preventScroll: true });
+            }
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) { reveal(); return; }
+            document.body.classList.add('startup-revealing');
+            panel.classList.add('startup-opening');
+            const fallback = setTimeout(reveal, 850);
+            panel.addEventListener('animationend', event => {
+                if (event.target !== panel) return;
+                clearTimeout(fallback);
+                reveal();
+            });
         }
         async function connect() {
             retry.hidden = proceed.hidden = true;
