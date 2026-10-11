@@ -1,8 +1,21 @@
 import { apiConfig, wakeBackend } from '../../services/api.mjs';
 
+const SESSION_KEY = 'kurt-startup-seen-v1';
+function startupSeen() {
+    try { return sessionStorage.getItem(SESSION_KEY) === '1'; }
+    catch { return document.cookie.split(';').some(item => item.trim() === `${SESSION_KEY}=1`); }
+}
+function rememberStartup() {
+    try { sessionStorage.setItem(SESSION_KEY, '1'); }
+    catch {
+        // Session cookie fallback: no expiration and no personal information.
+        document.cookie = `${SESSION_KEY}=1; Path=/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+    }
+}
+
 /** Wait for backend readiness before mounting live pages. Mock mode opens directly. */
 export function startPortfolio() {
-    if (apiConfig.mode !== 'live') return Promise.resolve();
+    if (apiConfig.mode !== 'live' || startupSeen()) return Promise.resolve();
     return new Promise(resolve => {
         const panel = document.createElement('section');
         panel.className = 'startup-screen';
@@ -33,6 +46,7 @@ export function startPortfolio() {
         function close(ready = true) {
             if (finished) return;
             finished = true;
+            rememberStartup();
             step(ready ? 'Backend connected — ready' : 'Opening website without waiting');
             progress.textContent = ready ? '100%' : 'Skipped';
             panel.classList.add('startup-complete');

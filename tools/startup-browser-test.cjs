@@ -27,6 +27,14 @@ const assert = require('node:assert/strict');
       await page.locator('.startup-screen').waitFor({state:'detached',timeout:10000});
       assert.equal(probes,2);assert.equal(premature,false);
       assert.equal(await page.locator('#main').evaluate(el=>el.inert),false);
+      for (const path of ['/about/', '/projects/', '/contact/']) {
+        await page.goto('http://127.0.0.1:4173' + path);
+        await page.evaluate(async () => { await (await import('/components/layout/startup.mjs')).startPortfolio(); });
+        assert.equal(await page.locator('.startup-screen').count(),0);
+      }
+      await page.reload();
+      await page.evaluate(async () => { await (await import('/components/layout/startup.mjs')).startPortfolio(); });
+      assert.equal(probes,2,'Navigation and reload must not restart the startup health probes');
       assert.deepEqual(errors,[]);
       await context.close();
     }
@@ -37,6 +45,9 @@ const assert = require('node:assert/strict');
     await page.locator('.startup-screen').waitFor({state:'detached'});
     assert.equal(await page.locator('.startup-screen').count(),0);
     assert.equal(await page.locator('#main').evaluate(el=>el.inert),false);
+    await page.goto('http://127.0.0.1:4173/about/');
+    await page.evaluate(async () => { await (await import('/components/layout/startup.mjs')).startPortfolio(); });
+    assert.equal(await page.locator('.startup-screen').count(),0,'Skip must also be remembered');
     await context.close();
     console.log('PASS: immediate wake probe, read-only retry, gated live content, responsive startup, reduced motion, safe failure/continue.');
   } finally { await browser.close(); }
