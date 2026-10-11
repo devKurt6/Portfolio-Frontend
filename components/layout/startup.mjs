@@ -10,7 +10,7 @@ export function startPortfolio() {
         panel.setAttribute('aria-modal', 'true');
         panel.setAttribute('aria-labelledby', 'startupTitle');
         panel.tabIndex = -1;
-        panel.innerHTML = `<div class="startup-card"><span class="startup-brand">Kurt<span>.</span>dev</span><div class="startup-orbit" aria-hidden="true"><span></span><span></span><span></span></div><p class="startup-eyebrow">WELCOME TO MY PORTFOLIO</p><h1 id="startupTitle">Starting things up</h1><p class="startup-status" role="status" aria-live="polite">Connecting to projects and the Freedom Wall…</p><div class="startup-track" aria-hidden="true"><span></span></div><p class="startup-hint">The first visit may take about a minute while the server wakes up.</p><div class="startup-actions"><button class="btn primary" id="startupRetry" hidden>Try again</button><button class="btn" id="startupContinue" hidden>Browse website anyway</button></div></div>`;
+        panel.innerHTML = `<div class="startup-card"><h1 id="startupTitle" class="startup-brand">Kurt<span>.dev</span></h1><svg class="startup-wave" viewBox="0 0 360 60" aria-hidden="true"><path d="M0 30h44l8-22 12 44 10-32 8 10h64l8-18 12 36 10-28 8 10h164"/></svg><ul class="startup-log" aria-hidden="true"></ul><p class="startup-status sr-only" role="status" aria-live="polite">Connecting to projects and the Freedom Wall…</p><div class="startup-track" aria-hidden="true"><span></span></div><div class="startup-meta"><span class="startup-progress">Connecting…</span><button class="startup-skip" id="startupContinue">Skip</button></div><p class="startup-hint">The first visit may take about a minute while the server wakes up.</p><div class="startup-actions"><button class="btn primary" id="startupRetry" hidden>Try again</button></div></div>`;
         const siblings = [...document.body.children].filter(element => element instanceof HTMLElement);
         const saved = siblings.map(element => ({ element: /** @type {HTMLElement} */ (element), inert: /** @type {HTMLElement} */ (element).inert }));
         const oldOverflow = document.body.style.overflow;
@@ -21,10 +21,21 @@ export function startPortfolio() {
         const status = /** @type {HTMLElement} */ (panel.querySelector('.startup-status'));
         const retry = /** @type {HTMLButtonElement} */ (panel.querySelector('#startupRetry'));
         const proceed = /** @type {HTMLButtonElement} */ (panel.querySelector('#startupContinue'));
+        const log = /** @type {HTMLElement} */ (panel.querySelector('.startup-log'));
+        const progress = /** @type {HTMLElement} */ (panel.querySelector('.startup-progress'));
+        /** @param {string} text */
+        function step(text) {
+            const line = document.createElement('li');
+            line.textContent = text;
+            log.append(line);
+        }
         let finished = false;
-        function close() {
+        function close(ready = true) {
             if (finished) return;
             finished = true;
+            step(ready ? 'Backend connected — ready' : 'Opening website without waiting');
+            progress.textContent = ready ? '100%' : 'Skipped';
+            panel.classList.add('startup-complete');
             retry.disabled = proceed.disabled = true;
             // Mount live content beneath the opening screen, so its requests
             // start during the transition instead of after it disappears.
@@ -39,7 +50,7 @@ export function startPortfolio() {
             if (matchMedia('(prefers-reduced-motion: reduce)').matches) { reveal(); return; }
             document.body.classList.add('startup-revealing');
             panel.classList.add('startup-opening');
-            const fallback = setTimeout(reveal, 850);
+            const fallback = setTimeout(reveal, 1100);
             panel.addEventListener('animationend', event => {
                 if (event.target !== panel) return;
                 clearTimeout(fallback);
@@ -47,22 +58,30 @@ export function startPortfolio() {
             });
         }
         async function connect() {
-            retry.hidden = proceed.hidden = true;
+            retry.hidden = true;
+            proceed.hidden = false;
+            log.replaceChildren();
+            step('Initialising interface');
+            step('Connecting projects and Freedom Wall');
+            progress.textContent = 'Connecting…';
             panel.classList.remove('startup-failed');
             status.textContent = 'Connecting to projects and the Freedom Wall…';
-            const timer = setTimeout(() => { if (!finished) status.textContent = 'Waking up the server. Your portfolio will open automatically…'; }, 4000);
+            const timer = setTimeout(() => { if (!finished) { step('Waking up server — please wait'); progress.textContent = 'Waiting for server'; status.textContent = 'Waking up the server. Your portfolio will open automatically…'; } }, 4000);
             try { await wakeBackend(); close(); }
             catch (error) {
                 if (finished) return;
                 clearTimeout(timer);
                 panel.classList.add('startup-failed');
                 status.textContent = error instanceof Error ? error.message : 'Could not connect. Please retry.';
+                step('Connection delayed — retry available');
+                progress.textContent = 'Not connected';
+                proceed.textContent = 'Browse anyway';
                 retry.hidden = proceed.hidden = false;
                 retry.focus();
             } finally { clearTimeout(timer); }
         }
         retry.onclick = () => { void connect(); };
-        proceed.onclick = close;
+        proceed.onclick = () => close(false);
         panel.addEventListener('keydown', event => {
             if (event.key !== 'Tab') return;
             const buttons = [retry, proceed].filter(button => !button.hidden);

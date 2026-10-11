@@ -1636,35 +1636,31 @@ input[aria-invalid=true],textarea[aria-invalid=true] {
   }
 }
 
-/* Backend startup screen: only shown while live API readiness is checked. */
-.startup-screen { position:fixed; inset:0; z-index:10000; display:grid; place-items:center; padding:24px; overflow:auto; background:var(--bg,#101018); color:var(--text,#f5f5fa); background-image:radial-gradient(ellipse at 50% 38%,rgba(139,92,246,.15),transparent 65%); }
-.startup-card { width:min(100%,520px); text-align:center; }
-.startup-brand { font-family:'Bricolage Grotesque',sans-serif; font-size:26px; font-weight:800; }
-.startup-brand span { color:#a78bfa; }
-.startup-eyebrow { font-size:11px; letter-spacing:.2em; margin:24px 0 12px; color:var(--muted,#aaa7bc); }
-.startup-card h1 { font-size:clamp(28px,6vw,44px); margin:0 0 16px; }
-.startup-status { line-height:1.7; min-height:3.4em; margin:0 auto; max-width:440px; }
-.startup-hint { color:var(--muted,#aaa7bc); font-size:13px; line-height:1.7; margin:22px auto; max-width:360px; }
-.startup-orbit { width:88px; height:88px; margin:42px auto 0; position:relative; border:1px solid rgba(167,139,250,.22); border-radius:50%; }
-.startup-orbit::before { content:''; position:absolute; inset:15px; border-radius:50%; border:1px solid rgba(167,139,250,.4); }
-.startup-orbit span { position:absolute; inset:0; border-radius:50%; animation:startup-spin 2.6s linear infinite; }
-.startup-orbit span::before { content:''; position:absolute; width:9px; height:9px; border-radius:50%; background:#a78bfa; left:calc(50% - 4px); top:-4px; box-shadow:0 0 22px rgba(167,139,250,.65); }
-.startup-orbit span:nth-child(2) { inset:15px; animation-direction:reverse; animation-duration:3.5s; }
-.startup-orbit span:nth-child(3) { inset:32px; animation-duration:1.8s; }
-.startup-track { height:3px; width:min(100%,240px); margin:24px auto 0; overflow:hidden; border-radius:3px; background:rgba(167,139,250,.15); }
-.startup-track span { display:block; width:40%; height:100%; background:#a78bfa; animation:startup-sweep 2s ease-in-out infinite alternate; }
-.startup-actions { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
-.startup-actions [hidden] { display:none!important; }
-.startup-failed .startup-orbit span,.startup-failed .startup-track span { animation-play-state:paused; }
-@keyframes startup-spin { to { transform:rotate(360deg); } }
-@keyframes startup-sweep { from { transform:translateX(-100%); } to { transform:translateX(250%); } }
-@media(prefers-reduced-motion:reduce) { .startup-orbit span,.startup-track span { animation:none!important; } }
-
-/* Open the portfolio smoothly once the backend is ready. */
-.startup-screen.startup-opening { animation:startup-open .75s cubic-bezier(.22,1,.36,1) both; pointer-events:none; }
-.startup-opening .startup-card { animation:startup-card-exit .6s cubic-bezier(.22,1,.36,1) both; }
-.startup-revealing > main { animation:portfolio-reveal .8s cubic-bezier(.22,1,.36,1) both; }
-@keyframes startup-open { from { opacity:1; } to { opacity:0; } }
-@keyframes startup-card-exit { from { opacity:1; transform:translateY(0) scale(1); } to { opacity:0; transform:translateY(-28px) scale(.96); } }
-@keyframes portfolio-reveal { from { opacity:.25; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-@media(prefers-reduced-motion:reduce) { .startup-screen.startup-opening,.startup-opening .startup-card,.startup-revealing > main { animation:none!important; } }
+/* Startup reference: heartbeat trace, terminal steps, and upward curtain. */
+.startup-screen { position:fixed; inset:0; z-index:10000; display:grid; place-items:center; padding:24px; overflow:auto; background:var(--bg); color:var(--text); }
+.startup-card { width:min(360px,86vw); text-align:left; }
+.startup-card .startup-brand { font:800 36px var(--heading); letter-spacing:-.02em; margin:0; line-height:1.15; }
+.startup-brand span { color:var(--accent); }
+.startup-wave { width:100%; height:56px; margin:14px 0 6px; display:block; }
+.startup-wave path { fill:none; stroke:var(--accent); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:760; stroke-dashoffset:760; animation:startup-trace 2.6s ease-out forwards; }
+.startup-log { list-style:none; margin:0 0 14px; padding:0; min-height:112px; font:13px/1.8 var(--font-code); color:var(--muted); }
+.startup-log li { animation:startup-line .3s both; }
+.startup-log li::before { content:"> "; color:var(--teal); }
+.startup-track { height:4px; background:var(--surface-2); border-radius:9px; overflow:hidden; }
+.startup-track span { display:block; height:100%; width:32%; background:var(--accent); animation:startup-wait 1.8s ease-in-out infinite alternate; }
+.startup-complete .startup-track span { width:100%; animation:none; transform:none; transition:width .15s linear; }
+.startup-meta { display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:13px; color:var(--muted); gap:16px; }
+.startup-skip { background:none; border:0; color:var(--muted); cursor:pointer; font:500 13px var(--body); text-decoration:underline; padding:4px; }
+.startup-hint { color:var(--muted); font-size:12px; line-height:1.6; margin:20px 0 0; }
+.startup-actions { margin-top:16px; }
+.startup-screen [hidden] { display:none!important; }
+.startup-failed .startup-track span { animation-play-state:paused; }
+.startup-screen.startup-opening { animation:startup-curtain .8s cubic-bezier(.76,0,.24,1) both; pointer-events:none; }
+.startup-revealing > main { animation:portfolio-reveal .7s ease .25s both; }
+.startup-revealing > .site-header { animation:startup-line .7s ease .25s both; }
+@keyframes startup-trace { to { stroke-dashoffset:0; } }
+@keyframes startup-line { from { opacity:0; } to { opacity:1; } }
+@keyframes startup-wait { from { transform:translateX(-100%); } to { transform:translateX(310%); } }
+@keyframes startup-curtain { 0% { transform:translateY(0); opacity:1; } 25% { opacity:1; } 100% { transform:translateY(-100%); opacity:0; } }
+@keyframes portfolio-reveal { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+@media(prefers-reduced-motion:reduce) { .startup-wave path { stroke-dashoffset:0; } .startup-wave path,.startup-log li,.startup-track span,.startup-screen.startup-opening,.startup-revealing > main,.startup-revealing > .site-header { animation:none!important; transition:none!important; } }
