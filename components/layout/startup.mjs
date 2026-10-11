@@ -57,7 +57,7 @@ export function startPortfolio() {
             clearLogTimers();
             document.documentElement.classList.remove('startup-pending');
             rememberStartup();
-            step(ready ? 'Backend connected — ready' : 'Opening website without waiting');
+            if (!ready) step('Opening website without waiting');
             progress.textContent = ready ? '100%' : 'Skipped';
             panel.classList.add('startup-complete');
             retry.disabled = proceed.disabled = true;
