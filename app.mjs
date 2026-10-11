@@ -1,5 +1,6 @@
 import { useTheme } from './hooks/useTheme.mjs';
 import { toast } from './components/ui/toast.mjs';
+import { startPortfolio } from './components/layout/startup.mjs';
 useTheme();
 const legacyRoutes = new Map([['home', '/'], ['projects', '/projects/'], ['about', '/about/'], ['contact', '/contact/']]);
 function legacyNavigation() { const hash = location.hash.slice(1); const path = legacyRoutes.get(hash); if (path) {
@@ -13,7 +14,7 @@ window.addEventListener('hashchange', legacyNavigation);
 const loaders = { home: () => import('./pages/home.mjs'), projects: () => import('./pages/projects.mjs'), about: () => import('./pages/about.mjs'), contact: () => import('./pages/contact.mjs') };
 const key = /** @type {keyof typeof loaders} */ (document.body.dataset.page);
 if (key in loaders)
-    loaders[key]().then(module => module.mount()).catch(() => toast('Some interactions could not load. Please refresh to try again.'));
+    startPortfolio().then(() => loaders[key]()).then(module => module.mount()).catch(() => toast('Some interactions could not load. Please refresh to try again.'));
 const fab = /** @type {HTMLButtonElement | null} */ (document.getElementById('chatToggle'));
 /** @type {Promise<import('./components/chatbot/panel.mjs').ChatController> | undefined} */ let chat;
 fab?.addEventListener('click', async () => { fab.disabled = true; try {

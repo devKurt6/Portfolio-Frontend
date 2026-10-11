@@ -54,3 +54,10 @@ Optional Playwright QA scripts in `tools/` require a QA runtime; `backend-browse
 `.gitignore` excludes `.env`, `node_modules`, `dist`, and `.qa`. If uploading through GitHub’s browser, omit those manually. Include `.env.example` and all source/config/content files.
 
 The backend is independently seeded from its own `app/content/` snapshots. When editing frontend `data/projects.json` or `portfolio/about.txt`, update the separate backend snapshots deliberately. Backend startup now adds/updates project content by slug without clearing wall data. Deploy the updated backend seed script to enable this behavior. No sibling-folder filesystem access is required by either app.
+
+
+## Startup screen
+
+In live mode, the portfolio displays an animated startup screen and immediately calls the Render `/api/health` endpoint to wake the backend. Health probes retry for about 90 seconds, with a 20-second maximum per attempt. Live project/wall initialization begins after readiness; a healthy backend opens immediately, and mock mode skips the screen. There is no simulated percentage or forced waiting period.
+
+On failure, visitors can retry or browse anyway; live content may remain unavailable, but static pages and the independent legacy contact/chat services can still be used. Reduced-motion preferences are respected, and the overlay manages keyboard focus and blocks interaction with the obscured page. Deploy the frontend to publish this behavior; no backend change is needed.

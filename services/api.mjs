@@ -1,6 +1,23 @@
 import { createMockWall } from './wall-mock.mjs';
 import { runtimeConfig } from '../config/runtime.mjs';
 export const apiConfig = runtimeConfig;
+/** Wake Render immediately; retry read-only health probes for up to 90 seconds.
+ * @param {(elapsed:number) => void} [status]
+ */
+export async function wakeBackend(status = () => {}) {
+    if (apiConfig.mode !== 'live') return;
+    if (!apiConfig.baseUrl) throw new ApiError('The live API URL has not been configured.');
+    const started = Date.now();
+    while (Date.now() - started < 90000) {
+        status(Date.now() - started);
+        try {
+            const health = await request(apiConfig.baseUrl.replace(/\/$/, '') + '/api/health', {}, true, Math.max(1, Math.min(20000, 90000 - (Date.now() - started))));
+            if (/** @type {{status?:string}} */ (health).status === 'ok') return;
+        } catch { /* A sleeping server can time out before it becomes ready. */ }
+        if (Date.now() - started < 90000) await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+    throw new ApiError('The portfolio is taking longer to connect. Please retry, or browse the website while live content is unavailable.');
+}
 let storage = null;
 try { if (typeof window !== 'undefined') storage = window.sessionStorage; } catch { /* Disabled storage. */ }
 const wall = createMockWall({ storage });
@@ -17,9 +34,9 @@ export class ApiError extends Error {
     /** @param {string} message @param {number} status @param {number} retryAfter */
     constructor(message, status = 0, retryAfter = 0) { super(message); this.status = status; this.retryAfter = retryAfter; }
 }
-/** @template T @param {string} url @param {RequestInit} [options] @param {boolean} [json] @returns {Promise<T>} */
-async function request(url, options = {}, json = true) {
-    const abort = new AbortController(); const timer = setTimeout(() => abort.abort(), 20000);
+/** @template T @param {string} url @param {RequestInit} [options] @param {boolean} [json] @param {number} [timeout] @returns {Promise<T>} */
+async function request(url, options = {}, json = true, timeout = 20000) {
+    const abort = new AbortController(); const timer = setTimeout(() => abort.abort(), timeout);
     try {
         const response = await fetch(url, { ...options, signal: abort.signal }); const text = await response.text(); let data;
         try { data = json ? JSON.parse(text) : text; } catch { throw new ApiError('The server returned an unexpected response. Please retry.', response.status); }
