@@ -84,7 +84,7 @@
     "video": "",
     "demo": "https://smart-helmet-rider.onrender.com/",
     "github": "",
-    "featured": true,
+    "featured": false,
     "highlights": [
       "ESP32",
       "FastAPI",
