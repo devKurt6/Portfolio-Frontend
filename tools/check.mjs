@@ -40,8 +40,8 @@ for (const file of htmlFiles) {
         errors.push(`${file}: missing favicon`);
 }
 const data = JSON.parse(await readFile('data/projects.json', 'utf8'));
-if (data.length !== 7)
-    errors.push('Expected all seven original projects.');
+if (!data.length || new Set(data.map(project => project.slug)).size !== data.length)
+    errors.push('Project data must contain unique project slugs.');
 const generated = await Promise.all(htmlFiles.map(file => readFile(file, 'utf8')));
 const allHTML = generated.join('\n');
 const plain = html => html.replace(/<[^>]*>/g,' ').replaceAll('&amp;','&').replaceAll('&#39;',"'").replace(/\s+/g,' ').trim();
@@ -67,4 +67,4 @@ if (errors.length) {
     process.exitCode = 1;
 }
 else
-    console.log(`Syntax and static validation passed: ${sources.length} source files, ${htmlFiles.length} HTML pages, all 7 projects and local routes/assets.`);
+    console.log(`Syntax and static validation passed: ${sources.length} source files, ${htmlFiles.length} HTML pages, all ${data.length} projects and local routes/assets.`);

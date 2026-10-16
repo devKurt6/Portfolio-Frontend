@@ -12,7 +12,7 @@ pnpm build
 pnpm dev
 ```
 
-Open `http://127.0.0.1:4173`. Copy `.env.example` to `.env` (PowerShell: `Copy-Item .env.example .env`; macOS/Linux: `cp .env.example .env`). For local live projects/wall, set:
+Open `http://127.0.0.1:4173`. Copy `.env.example` to `.env` (PowerShell: `Copy-Item .env.example .env`; macOS/Linux: `cp .env.example .env`). For the local live wall, set:
 
 ```dotenv
 PORTFOLIO_API_MODE=live
@@ -38,7 +38,7 @@ Set Netlify build variables:
 | `PORTFOLIO_CONTACT_MODE` | `legacy` |
 | `PORTFOLIO_CHAT_MODE` | `legacy` |
 
-Keep existing private `GROQ_API_KEY` and optional `SYSTEM_PROMPT` in Netlify’s function environment. Never expose backend `ADMIN_TOKEN` or `IP_HASH_SALT` here. Only the four public build values above reach the browser. Backend CORS must permit `https://kurt-profile.netlify.app`. Projects/wall use Render, contact remains Netlify Forms, and chat remains Groq.
+Keep existing private `GROQ_API_KEY` and optional `SYSTEM_PROMPT` in Netlify’s function environment. Never expose backend `ADMIN_TOKEN` or `IP_HASH_SALT` here. Only the four public build values above reach the browser. Backend CORS must permit `https://kurt-profile.netlify.app`. Projects are generated from `data/projects.json`; the wall uses Render, contact remains Netlify Forms, and chat remains Groq.
 
 ## Checks
 
@@ -53,7 +53,7 @@ Optional Playwright QA scripts in `tools/` require a QA runtime; `backend-browse
 
 `.gitignore` excludes `.env`, `node_modules`, `dist`, and `.qa`. If uploading through GitHub’s browser, omit those manually. Include `.env.example` and all source/config/content files.
 
-The backend is independently seeded from its own `app/content/` snapshots. When editing frontend `data/projects.json` or `portfolio/about.txt`, update the separate backend snapshots deliberately. Backend startup now adds/updates project content by slug without clearing wall data. Deploy the updated backend seed script to enable this behavior. No sibling-folder filesystem access is required by either app.
+Projects have one display source: frontend `data/projects.json`. Edit that file, add images under `images/`, and rebuild/redeploy the frontend. The build generates cards, filters, and `/projects/<slug>/` pages. Live mode does not replace projects with database content. Backend project snapshots/endpoints are retained for compatibility but are no longer used by the portfolio display; no backend project update is needed. Backend chat profile snapshots remain separate from displayed project content. Existing database records and Freedom Wall data are preserved.
 
 
 ## Startup screen

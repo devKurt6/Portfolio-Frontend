@@ -1,8 +1,7 @@
-import { hydrateProjects } from '../components/projects/live.mjs';
 import { apiConfig } from '../services/api.mjs';
 import { useInView } from '../hooks/useInView.mjs';
 import { toast } from '../components/ui/toast.mjs';
-export function mount() { const label = document.querySelector('.demo-label'); if (label && apiConfig.mode === 'live') label.textContent = 'Public wall · Messages are stored on the server and moderated.'; const featured = document.querySelector('.featured-section .projects-grid'); if (featured instanceof HTMLElement) void hydrateProjects(featured, 'featured'); const visual = document.getElementById('visualHost'); if (visual)
+export function mount() { const label = document.querySelector('.demo-label'); if (label && apiConfig.mode === 'live') label.textContent = 'Public wall · Messages are stored on the server and moderated.'; const visual = document.getElementById('visualHost'); if (visual)
     useInView(visual, async () => { try {
         (await import('../components/visual/canvas.mjs')).mount(visual);
     }

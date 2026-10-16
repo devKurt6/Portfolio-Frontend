@@ -51,9 +51,9 @@ function live(path, payload) {
     return request(apiConfig.baseUrl.replace(/\/$/, '') + '/api' + path, { method: payload === undefined ? 'GET' : 'POST', headers: { 'Content-Type': 'application/json', 'X-Visitor-Id': visitor() }, ...(payload === undefined ? {} : { body: JSON.stringify(payload) }) });
 }
 /** @returns {Promise<import('../types/index').Project[]>} */
-export function getProjects() { return apiConfig.mode === 'live' ? live('/projects') : request('/data/projects.json'); }
+export function getProjects() { return request('/data/projects.json'); }
 /** @param {string} slug @returns {Promise<import('../types/index').Project | undefined>} */
-export async function getProject(slug) { return apiConfig.mode === 'live' ? live('/projects/' + encodeURIComponent(slug)) : (await getProjects()).find(p => p.slug === slug); }
+export async function getProject(slug) { return (await getProjects()).find(p => p.slug === slug); }
 /** @returns {Promise<{category:string,skills:string[]}[]>} */
 export function getSkills() { return request('/portfolio/skills.json'); }
 /** @param {{sort?:'new'|'top',offset?:number,limit?:number}} params @returns {Promise<import('../types/index').WallPage>} */

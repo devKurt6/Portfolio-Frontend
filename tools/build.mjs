@@ -38,4 +38,4 @@ for (const name of ['success', 'error']) {
     await writeFile(`${name}.html`, documentShell({ title: name === 'success' ? 'Message Sent - Kurt Decena' : 'Error - Kurt Decena', page: name, body }));
 }
 await writeFile('type.html', documentShell({title:'Pure CSS Typing',page:'type',body:'<div class="wrap page-content"><h1 class="typewriter" aria-label="Kurt Decena">Kurt Decena</h1></div>'}));
-console.log('Built Home, Projects, 7 project details, About, Contact, and preserved success/error/typing pages.');
+console.log(`Built Home, Projects, ${projects.length} project details, About, Contact, and preserved success/error/typing pages.`);

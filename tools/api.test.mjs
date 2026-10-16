@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createMockWall } from '../services/wall-mock.mjs';
 import { validateContact, validateWall } from '../lib/validation.mjs';
-import { sendChat, sendContact, apiConfig, postWallMessage, wallCooldown, getWallMessages } from '../services/api.mjs';
+import { sendChat, sendContact, apiConfig, postWallMessage, wallCooldown, getWallMessages, getProjects, getProject } from '../services/api.mjs';
 test('wall pagination, cooldown, pending links, likes, sorting and reports', async () => {
     let clock=1000000;
     const wall=createMockWall({delay:0,now:()=>clock});
@@ -66,4 +66,21 @@ test('live adapter maps 422 and 429 and preserves wall response shape', async ()
         const expected={items:[],total:0,nextOffset:0};globalThis.fetch=async()=>new Response(JSON.stringify(expected));
         assert.deepEqual(await getWallMessages({sort:'top'}),expected);
     } finally {globalThis.fetch=original;Object.assign(apiConfig,previous);}
+});
+
+test('live projects use frontend JSON instead of the backend catalog', async () => {
+    const originalFetch = globalThis.fetch;
+    const previousMode = apiConfig.mode;
+    const calls = [];
+    apiConfig.mode = 'live';
+    globalThis.fetch = async url => {
+        calls.push(url);
+        return new Response(JSON.stringify([{slug:'frontend-project',title:'Frontend content'}]), {status:200});
+    };
+    try {
+        assert.equal((await getProjects())[0].title, 'Frontend content');
+        assert.equal((await getProject('frontend-project')).title, 'Frontend content');
+        assert.equal(await getProject('missing'), undefined);
+        assert.deepEqual(calls, ['/data/projects.json','/data/projects.json','/data/projects.json']);
+    } finally { globalThis.fetch = originalFetch; apiConfig.mode = previousMode; }
 });
