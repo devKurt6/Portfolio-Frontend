@@ -16,7 +16,7 @@ export function mount(host) {
     const more = /** @type {HTMLElement} */ (host.querySelector('#wallMore'));
     const error = /** @type {HTMLElement} */ (host.querySelector('#wallError'));
     const counter = /** @type {HTMLElement} */ (host.querySelector('#wallCounter'));
-    let emoji = '', posting = false;
+    let emoji = '', posting = false, unavailable = apiConfig.mode === 'live';
     const picker = /** @type {HTMLElement} */ (form.querySelector('.emoji-picker'));
     for (const value of ['👋', '🔥', '💡', '🙏', '💪', '🌱', '⭐', '🎉']) {
         const b = document.createElement('button');
@@ -30,20 +30,22 @@ export function mount(host) {
     text.addEventListener('input', () => { counter.textContent = `${text.value.length} / 300`; });
     form.addEventListener('focusin', () => document.body.classList.add('composing'));
     form.addEventListener('focusout', () => queueMicrotask(() => document.body.classList.toggle('composing', form.contains(document.activeElement))));
-    function cooldown() { const seconds = Math.ceil(wallCooldown() / 1000); submit.disabled = posting || seconds > 0; submit.textContent = posting ? 'Posting…' : seconds > 0 ? `Post again in ${seconds}s` : 'Post to the wall'; }
+    function cooldown() { const seconds = Math.ceil(wallCooldown() / 1000); submit.disabled = unavailable || posting || seconds > 0; submit.textContent = unavailable ? 'Waiting for connection...' : posting ? 'Posting…' : seconds > 0 ? `Post again in ${seconds}s` : 'Post to the wall'; }
     const timer = window.setInterval(cooldown, 500);
     window.addEventListener('pagehide', event => { if(!event.persisted)clearInterval(timer); });
     cooldown();
     /** @param {import('../../hooks/useWallMessages.mjs').WallState} state */
     function draw(state) {
+        unavailable = apiConfig.mode === 'live' && !state.items.length && (state.busy || Boolean(state.error));
+        cooldown();
         host.querySelectorAll('[data-sort]').forEach(node => node.setAttribute('aria-pressed', String(/** @type {HTMLElement} */ (node).dataset.sort === state.sort)));
         const count = host.querySelector('#wallCount');
         if (count)
-            count.textContent = `${state.total} notes`;
+            count.textContent = state.busy && !state.items.length ? 'Connecting...' : state.error && !state.items.length ? 'Connection unavailable' : `${state.total} notes`;
         notes.replaceChildren();
         more.replaceChildren();
         if (state.busy && !state.items.length) {
-            notes.innerHTML = '<div class="notes-grid" aria-label="Loading messages" aria-busy="true">' + Array(4).fill('<div class="card card-body" aria-hidden="true"><div class="skeleton" style="height:24px;width:65%"></div><div class="skeleton" style="height:70px;margin-top:15px"></div></div>').join('') + '</div>';
+            notes.innerHTML = (apiConfig.mode === 'live' ? '<p class="wall-connection" role="status">Waiting to connect to the Freedom Wall database. The server may be waking up; notes will appear automatically. You can keep browsing.</p>' : '') + '<div class="notes-grid" aria-label="Loading messages" aria-busy="true">' + Array(4).fill('<div class="card card-body" aria-hidden="true"><div class="skeleton" style="height:24px;width:65%"></div><div class="skeleton" style="height:70px;margin-top:15px"></div></div>').join('') + '</div>';
             return;
         }
         if (state.error) {

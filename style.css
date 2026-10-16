@@ -1671,3 +1671,5 @@ input[aria-invalid=true],textarea[aria-invalid=true] {
 .startup-pending body { overflow: hidden; }
 .startup-pending body > :not(.startup-screen) { visibility: hidden; }
 #startupScreen.startup-opening { display: grid; }
+
+.wall-connection { padding: 16px; border: 1px solid var(--accent); border-radius: 12px; color: var(--text); line-height: 1.6; margin-bottom: 16px; }

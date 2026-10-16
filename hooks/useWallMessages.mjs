@@ -1,4 +1,4 @@
-import { getWallMessages } from '../services/api.mjs';
+import { getWallMessages, wakeBackend } from '../services/api.mjs';
 /** @param {(state: WallState) => void} notify */
 export function useWallMessages(notify) {
     /** @type {WallState} */ const state = { sort: 'new', items: [], total: 0, nextOffset: 0, busy: false, error: '' };
@@ -9,6 +9,7 @@ export function useWallMessages(notify) {
         state.items = [];
         state.nextOffset = 0;
     } notify(state); try {
+        await wakeBackend();
         const result = await getWallMessages({ sort: state.sort, offset: state.nextOffset, limit: 6 });
         if (token !== version)
             return;

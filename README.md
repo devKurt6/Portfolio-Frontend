@@ -58,6 +58,6 @@ Projects have one display source: frontend `data/projects.json`. Edit that file,
 
 ## Startup screen
 
-In live mode, the portfolio displays an animated startup screen and immediately calls the Render `/api/health` endpoint to wake the backend. Health probes retry for about 90 seconds, with a 20-second maximum per attempt. Live project/wall initialization begins after readiness; a healthy backend opens immediately, and mock mode skips the screen. There is no simulated percentage or forced waiting period.
+In live mode, the introduction runs once per tab session for 2.5 seconds including the opening transition. Five messages appear gradually, ending with Ready. The backend health probe starts immediately in the background and never delays opening the portfolio. Mock mode skips the introduction.
 
-On failure, visitors can retry or browse anyway; live content may remain unavailable, but static pages and the independent legacy contact/chat services can still be used. Reduced-motion preferences are respected, and the overlay manages keyboard focus and blocks interaction with the obscured page. Deploy the frontend to publish this behavior; no backend change is needed.
+The Freedom Wall shares the background health probe and displays a waiting notice while connecting. Posting is disabled until the initial wall load succeeds; notes load automatically when the server is ready. Health probes retry for up to 90 seconds. If the connection fails, the wall offers Retry while visitors can continue browsing static pages. Reduced-motion preferences and keyboard focus are respected. Deploy only the frontend for this change.

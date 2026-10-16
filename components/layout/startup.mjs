@@ -14,8 +14,9 @@ function rememberStartup() {
     }
 }
 
-/** Wait for backend readiness before mounting live pages. Mock mode opens directly. */
+/** Play a fixed 2.5-second introduction; wake the backend independently. */
 export function startPortfolio() {
+    if (apiConfig.mode === 'live') void wakeBackend().catch(() => {});
     if (apiConfig.mode !== 'live' || startupSeen()) {
         document.getElementById('startupScreen')?.remove();
         document.documentElement.classList.remove('startup-pending');
@@ -81,42 +82,18 @@ export function startPortfolio() {
                 reveal();
             });
         }
-        async function connect() {
-            const shownAt = performance.now();
+        function connect() {
             retry.hidden = true;
-            proceed.hidden = false;
-            log.replaceChildren();
-            clearLogTimers();
             step('Starting your experience');
-            ['Preparing the interface', 'Setting up your workspace', 'Connecting portfolio services'].forEach((message, index) => {
-                logTimers.push(setTimeout(() => { if (!finished) step(message); }, (index + 1) * 500));
+            ['Preparing the interface', 'Setting up your workspace', 'Getting things ready', 'Ready'].forEach((message, index) => {
+                logTimers.push(setTimeout(() => { if (!finished) step(message); }, (index + 1) * 350));
             });
-            progress.textContent = 'Connecting…';
-            panel.classList.remove('startup-failed');
-            status.textContent = 'Connecting to projects and the Freedom Wall…';
-            const timer = setTimeout(() => { if (!finished) { step('Waking up server — please wait'); progress.textContent = 'Waiting for server'; status.textContent = 'Waking up the server. Your portfolio will open automatically…'; } }, 4000);
-            try {
-                await wakeBackend();
-                await new Promise(done => setTimeout(done, Math.max(0, 2000 - (performance.now() - shownAt))));
-                if (finished) return;
-                step('Ready');
-                await new Promise(done => setTimeout(done, 500));
-                close();
-            }
-            catch (error) {
-                if (finished) return;
-                clearTimeout(timer);
-                clearLogTimers();
-                panel.classList.add('startup-failed');
-                status.textContent = error instanceof Error ? error.message : 'Could not connect. Please retry.';
-                step('Connection delayed — retry available');
-                progress.textContent = 'Not connected';
-                proceed.textContent = 'Browse anyway';
-                retry.hidden = proceed.hidden = false;
-                retry.focus();
-            } finally { clearTimeout(timer); }
+            progress.textContent = 'Preparing...';
+            status.textContent = 'Preparing your portfolio experience';
+            // The 800 ms opening animation is included in the 2.5-second total.
+            const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 2500 : 1700;
+            logTimers.push(setTimeout(() => close(), duration));
         }
-        retry.onclick = () => { void connect(); };
         proceed.onclick = () => close(false);
         panel.addEventListener('keydown', event => {
             if (event.key !== 'Tab') return;

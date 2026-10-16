@@ -4,7 +4,7 @@ export const apiConfig = runtimeConfig;
 /** Wake Render immediately; retry read-only health probes for up to 90 seconds.
  * @param {(elapsed:number) => void} [status]
  */
-export async function wakeBackend(status = () => {}) {
+async function probeBackend(status = () => {}) {
     if (apiConfig.mode !== 'live') return;
     if (!apiConfig.baseUrl) throw new ApiError('The live API URL has not been configured.');
     const started = Date.now();
@@ -17,6 +17,14 @@ export async function wakeBackend(status = () => {}) {
         if (Date.now() - started < 90000) await new Promise(resolve => setTimeout(resolve, 1500));
     }
     throw new ApiError('The portfolio is taking longer to connect. Please retry, or browse the website while live content is unavailable.');
+}
+/** @type {Promise<void> | undefined} */
+let backendWake;
+/** Share the background health probe with the Freedom Wall. */
+export function wakeBackend() {
+    if (apiConfig.mode !== 'live') return Promise.resolve();
+    if (!backendWake) backendWake = probeBackend().catch(error => { backendWake = undefined; throw error; });
+    return backendWake;
 }
 let storage = null;
 try { if (typeof window !== 'undefined') storage = window.sessionStorage; } catch { /* Disabled storage. */ }
